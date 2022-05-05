@@ -9,18 +9,11 @@ import { onSnapshot, getFirestore, doc } from 'firebase/firestore';
 import SideBar from './components/sidebar.component';
 import Auth from './components/auth.component';
 import AppLayout from './components/app.component';
+import { EnvConfiguration } from './lib/interfaces.lib';
 
 process.env.NODE_ENV === 'production'
     ? require('./App.min.css')
     : require('./App.css');
-
-interface EnvConfiguration {
-    apiKey: string | undefined;
-    authDomain: string | undefined;
-    projectId: string | undefined;
-    appId: string | undefined;
-    measurementId: string | undefined;
-}
 
 // eslint-disable-next-line
 export default function App() {
@@ -86,13 +79,13 @@ export default function App() {
         }
     }, [auth]);
 
-    const handleCredential = useCallback((a) => {
+    const handleCredential = useCallback((a: any) => {
         if (a.id && a.value) setAuth({ ...auth, [a.id]: a.value });
         else setAuth(a);
     }, []);
 
     const handleChange = useCallback(
-        (a) => {
+        (a: any) => {
             if (a.goForward || a.goBackward)
                 setProperties({
                     ...properties,

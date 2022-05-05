@@ -91,7 +91,7 @@ const App = ({ properties, handleChange, config }: any) => {
     }, []); // eslint-disable-line
 
     const handleSong = useCallback(
-        (a) => {
+        (a: any) => {
             if (!a.id && !a.value) {
                 localStorage.setItem('music-session', JSON.stringify(a));
                 a.audio === song.audio.getAttribute('src')
