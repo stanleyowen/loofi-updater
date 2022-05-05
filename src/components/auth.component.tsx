@@ -1,37 +1,70 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { LoadingButton } from '@mui/lab';
 import { initializeApp } from 'firebase/app';
 import { generateToken } from '../lib/functions.component';
-import { GoogleAuthProvider, getAuth, signInWithPopup } from 'firebase/auth';
-import { Alert, Slide, Button, Snackbar, SlideProps } from '@mui/material';
+import { doc, getDoc, getFirestore } from 'firebase/firestore';
+import { Alert, Slide, Snackbar, SlideProps } from '@mui/material';
+import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { AuthInterface } from '../lib/interfaces.lib';
 
 type TransitionProps = Omit<SlideProps, 'direction'>;
 
-const About = ({ config, handleCredential }: any) => {
+const Auth = ({ config, handleCredential }: AuthInterface) => {
     initializeApp(config);
-    const whiteListedEmails: string[] | undefined =
-        process.env.REACT_APP_WHITELISTED_EMAIL?.split(', ');
+
     const [status, setStatus] = useState<{
         isError: boolean;
         message:
             | null
             | 'Invalid Credentials'
             | 'Something Went Wrong. Please Try Again Later.'
-            | 'No Whitelisted Emails are Found.';
+            | 'No Whitelisted Emails are Found. Retrying in 10 seconds...';
     }>({
         isError: false,
         message: 'Invalid Credentials',
     });
+    const [isLoading, setLoading] = useState<boolean>(false);
     const [transition, setTransition] = useState<
         React.ComponentType<TransitionProps> | undefined
     >(undefined);
 
-    useEffect(() => {
-        for (let i = 0; i < 79; i++) {
-            const div = document.createElement('div');
-            div.style.opacity = `${Math.random() * (0.075 - 0.025) + 0.025}`;
-            document.querySelector('.backdrop-overlay')?.appendChild(div);
+    async function loadUsers(callback: (users: string) => void) {
+        const data = await getDoc(
+            doc(getFirestore(), 'thalia-tiffany', 'emails')
+        );
+        if (data.exists()) callback(JSON.stringify(Object.keys(data.data())));
+        else {
+            setStatus({
+                isError: true,
+                message:
+                    'No Whitelisted Emails are Found. Retrying in 10 seconds...',
+            });
+            setTimeout(
+                () =>
+                    setStatus({
+                        isError: false,
+                        message: null,
+                    }),
+                5000
+            );
         }
-    }, []);
+    }
+
+    function parseError() {
+        setLoading(false);
+        setStatus({
+            isError: true,
+            message: 'Something Went Wrong. Please Try Again Later.',
+        });
+        setTimeout(
+            () =>
+                setStatus({
+                    isError: false,
+                    message: null,
+                }),
+            5000
+        );
+    }
 
     return (
         <div>
@@ -43,98 +76,89 @@ const About = ({ config, handleCredential }: any) => {
 
             <div className="bg-white container p-10 rounded-corner">
                 <h3 className="center-align mb-10">Welcome Back!</h3>
-                <Button
+                <LoadingButton
                     variant="outlined"
                     className="mt-10 w-100"
+                    loading={isLoading}
                     onClick={() => {
+                        setLoading(true);
                         signInWithPopup(getAuth(), new GoogleAuthProvider())
                             .then((result) => {
+                                let isAuth = false;
                                 function Transition(props: TransitionProps) {
                                     return (
                                         <Slide {...props} direction="right" />
                                     );
                                 }
-                                setTransition(() => Transition);
-                                if (result) {
-                                    if (whiteListedEmails)
-                                        whiteListedEmails.forEach(
-                                            (email, index) => {
-                                                if (
-                                                    result.user.email === email
-                                                ) {
-                                                    generateToken(
-                                                        result.user.email
-                                                    );
-                                                    handleCredential({
-                                                        id: 'isLoading',
-                                                        value: false,
-                                                    });
-                                                } else if (
-                                                    index ===
-                                                    whiteListedEmails.length - 1
-                                                ) {
-                                                    setStatus({
-                                                        isError: true,
-                                                        message:
-                                                            'Invalid Credentials',
-                                                    });
-                                                    handleCredential({
-                                                        id: 'isLoading',
-                                                        value: false,
-                                                    });
+
+                                function parseData() {
+                                    loadUsers((users) => {
+                                        if (JSON.parse(users).length > 0) {
+                                            JSON.parse(users).forEach(
+                                                (
+                                                    email: string,
+                                                    index: number
+                                                ) => {
+                                                    if (
+                                                        result.user.email ===
+                                                        email
+                                                    ) {
+                                                        isAuth = true;
+                                                        generateToken(
+                                                            result.user.email
+                                                        );
+                                                        handleCredential({
+                                                            id: 'isLoading',
+                                                            value: false,
+                                                        });
+                                                    } else if (
+                                                        !isAuth &&
+                                                        index ===
+                                                            JSON.parse(users)
+                                                                .length -
+                                                                1
+                                                    ) {
+                                                        setLoading(false);
+                                                        setStatus({
+                                                            isError: true,
+                                                            message:
+                                                                'Invalid Credentials',
+                                                        });
+                                                        handleCredential({
+                                                            id: 'isLoading',
+                                                            value: false,
+                                                        });
+                                                        setTimeout(
+                                                            () =>
+                                                                setStatus({
+                                                                    isError:
+                                                                        false,
+                                                                    message:
+                                                                        null,
+                                                                }),
+                                                            5000
+                                                        );
+                                                    }
                                                 }
-                                            }
-                                        );
-                                    else {
-                                        setStatus({
-                                            isError: true,
-                                            message:
-                                                'No Whitelisted Emails are Found.',
-                                        });
-                                        setTimeout(
-                                            () =>
-                                                setStatus({
-                                                    isError: false,
-                                                    message: null,
-                                                }),
-                                            5000
-                                        );
-                                    }
-                                } else {
-                                    setStatus({
-                                        isError: true,
-                                        message:
-                                            'Something Went Wrong. Please Try Again Later.',
+                                            );
+                                        } else
+                                            setTimeout(
+                                                () => parseData(),
+                                                10000
+                                            );
                                     });
-                                    setTimeout(
-                                        () =>
-                                            setStatus({
-                                                isError: false,
-                                                message: null,
-                                            }),
-                                        5000
-                                    );
                                 }
+
+                                setTransition(() => Transition);
+
+                                if (result) parseData();
+                                else parseError();
                             })
-                            .catch(() => {
-                                setStatus({
-                                    isError: true,
-                                    message:
-                                        'Something Went Wrong. Please Try Again Later.',
-                                });
-                                setTimeout(
-                                    () =>
-                                        setStatus({
-                                            isError: false,
-                                            message: null,
-                                        }),
-                                    5000
-                                );
-                            });
+                            .catch(() => parseError());
                     }}
                 >
                     Sign in with Google
-                </Button>
+                </LoadingButton>
             </div>
 
             <Snackbar open={status.isError} TransitionComponent={transition}>
@@ -144,4 +168,4 @@ const About = ({ config, handleCredential }: any) => {
     );
 };
 
-export default About;
+export default Auth;
