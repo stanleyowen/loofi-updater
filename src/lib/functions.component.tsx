@@ -1,6 +1,16 @@
-import React from 'react';
-import { randomBytes } from 'crypto';
 import { getFirestore, setDoc, doc } from 'firebase/firestore';
+
+function getRandomString(length: number, callback: (hash: string) => void) {
+    const randomChars =
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+        result += randomChars.charAt(
+            Math.floor(Math.random() * randomChars.length)
+        );
+    }
+    callback(result);
+}
 
 function setCookie(name: string, value: string) {
     let expires = '';
@@ -14,15 +24,14 @@ function setCookie(name: string, value: string) {
 }
 
 export const generateToken = (email: string) => {
-    randomBytes(132, (err, byte) => {
-        const token: string = byte.toString('hex');
-        setTokenToCloud(email, token);
+    getRandomString(264, (hash) => {
+        setTokenToCloud(email, hash);
     });
 };
 
 export const setTokenToCloud = (email: string, token: string) => {
     setDoc(
-        doc(getFirestore(), 'loofi-dashboard', `${email.split('@')[0]}-token`),
+        doc(getFirestore(), 'thalia-tiffany', `${email.split('@')[0]}-token`),
         {
             email,
             token,
