@@ -14,10 +14,10 @@ import {
     HomeOutline,
     SettingsSolid,
     SettingsOutline,
-    MusicSolid,
-    MusicOutline,
     LogsSolid,
     LogsOutline,
+    LogsSolid as PathSolid,
+    LogsOutline as PathOutline,
 } from '../lib/icons.component';
 
 // eslint-disable-next-line
@@ -43,17 +43,17 @@ const SideBar = ({ handleChange, properties }: any) => {
     return (
         <div className="sidebar">
             <div id="tabs">
-                {['Home', 'Music', 'Logs', 'Settings'].map((tab, index) => {
+                {['Home', 'Path', 'Logs', 'Settings'].map((tab, index) => {
                     const components: { [key: string]: any } = {
                         Download,
                         HomeSolid,
                         HomeOutline,
-                        MusicSolid,
-                        MusicOutline,
                         SettingsSolid,
                         SettingsOutline,
                         LogsSolid,
                         LogsOutline,
+                        PathSolid,
+                        PathOutline,
                     };
                     const SolidIcon = components[`${tab}Solid`];
                     const OutlineIcon = components[`${tab}Outline`];

@@ -1,6 +1,7 @@
 import React from 'react';
 
 import Logs from './logs.component';
+import Path from './logs-path.component';
 import Home from './home.component';
 import Settings from './settings.component';
 
@@ -11,7 +12,6 @@ const BaseLayout = ({
     songData,
     handleSong,
     HOST_DOMAIN,
-    rawSongData,
     handleChange,
 }: any) => {
     return (
@@ -27,6 +27,8 @@ const BaseLayout = ({
                 />
             ) : properties.activeTab === 'logs' ? (
                 <Logs properties={properties} HOST_DOMAIN={HOST_DOMAIN} />
+            ) : properties.activeTab === 'path' ? (
+                <Path properties={properties} HOST_DOMAIN={HOST_DOMAIN} />
             ) : (
                 <Settings />
             )}
