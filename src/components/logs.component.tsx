@@ -1,11 +1,4 @@
-import {
-    onValue,
-    getDatabase,
-    ref,
-    set,
-    remove,
-    update,
-} from '@firebase/database';
+import { onValue, ref, set, remove, update } from '@firebase/database';
 import {
     Alert,
     Button,
@@ -23,6 +16,14 @@ import {
     TextField,
     DialogActions,
 } from '@mui/material';
+import {
+    collection,
+    getDoc,
+    getDocs,
+    getFirestore,
+    orderBy,
+    query,
+} from 'firebase/firestore';
 import React, { useState, useEffect } from 'react';
 
 const Music = ({ properties }: any) => {
@@ -56,91 +57,38 @@ const Music = ({ properties }: any) => {
     };
 
     useEffect(() => {
-        onValue(ref(getDatabase(), 'loofi-logs/'), (snapshot) => {
-            setLogData(snapshot.val());
+        getDocs(
+            query(
+                collection(getFirestore(), 'logs/'),
+                orderBy('timestamp', 'desc')
+            )
+        ).then((snapshot) => {
+            const rawLogs: any = [];
+            snapshot.docs.map((doc) => rawLogs.push(doc.data()));
+            setLogData(rawLogs);
         });
     }, []);
 
-    const AddMusic = (e: React.MouseEvent<HTMLButtonElement>) => {
-        e.preventDefault();
-        handleStatus('isLoading', true);
-        const id = musicData.properties.id + page * rowPerPage;
-        if (musicData.properties.isUpdate) {
-            delete musicData.properties;
-            update(ref(getDatabase()), {
-                ['loofi-music/' + id]: musicData,
-            })
-                .then(() => {
-                    handleStatus('isLoading', false);
-                    setMusicDialogIsOpen(false);
-                    setMusicData({
-                        audio: '',
-                        author: '',
-                        image: '',
-                        title: '',
-                        properties: {
-                            isUpdate: false,
-                            id: null,
-                        },
-                    });
-                })
-                .catch(() => {
-                    handleStatus('isLoading', false);
-                    handleStatus('isError', true);
-                });
-        } else {
-            delete musicData.properties;
-            set(
-                ref(getDatabase(), 'loofi-music/' + logs.length ?? 'null'),
-                musicData
-            )
-                .then(() => {
-                    handleStatus('isLoading', false);
-                    setMusicDialogIsOpen(false);
-                    setMusicData({
-                        audio: '',
-                        author: '',
-                        image: '',
-                        title: '',
-                        properties: {
-                            isUpdate: false,
-                            id: null,
-                        },
-                    });
-                })
-                .catch(() => {
-                    handleStatus('isLoading', false);
-                    handleStatus('isError', true);
-                });
-        }
-    };
-
-    const UpdateMusic = (id: number, data: any) => {
-        setMusicDialogIsOpen(true);
-        setMusicData({
-            ...data,
-            properties: {
-                id,
-                isUpdate: true,
-            },
-        });
-    };
-
-    const DeleteMusic = () => {
-        setMusicDialogIsOpen(false);
-        const id = musicData.properties.id + page * rowPerPage;
-        remove(ref(getDatabase(), 'loofi-music/' + id));
-    };
+    // const DeleteMusic = () => {
+    //     setMusicDialogIsOpen(false);
+    //     const id = musicData.properties.id + page * rowPerPage;
+    //     remove(ref(getFirestore(), 'logs/' + id));
+    // };
 
     const columns = [
         {
-            id: 'title',
-            label: 'Title',
+            id: 'error',
+            label: 'Error',
             minWidth: 170,
         },
         {
-            id: 'author',
-            label: 'Author',
+            id: 'message',
+            label: 'Description',
+            minWidth: 100,
+        },
+        {
+            id: 'timestamp',
+            label: 'Timestamp',
             minWidth: 100,
         },
     ];
@@ -150,7 +98,7 @@ const Music = ({ properties }: any) => {
             <div className="col-2 mb-10">
                 <div className="card p-10">
                     <h2 className="center-align">
-                        {logs.length === 0 ? '-' : logs.length}
+                        {logs && logs.length === 0 ? '-' : logs.length}
                     </h2>
                     <p className="center-align">Music</p>
                 </div>
@@ -159,13 +107,6 @@ const Music = ({ properties }: any) => {
                     <p className="center-align">Music</p>
                 </div>
             </div>
-
-            <Button
-                variant="outlined"
-                onClick={() => setMusicDialogIsOpen(true)}
-            >
-                Add Music
-            </Button>
 
             <TableContainer>
                 <Table className="card">
@@ -183,7 +124,7 @@ const Music = ({ properties }: any) => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {logs.length > 0 ? (
+                        {logs && logs?.length > 0 ? (
                             logs
                                 .slice(
                                     page * rowPerPage,
@@ -191,17 +132,30 @@ const Music = ({ properties }: any) => {
                                 )
                                 .map((song: any, index: number) => {
                                     return (
-                                        <TableRow
-                                            hover
-                                            key={index}
-                                            onClick={() =>
-                                                UpdateMusic(index, song)
-                                            }
-                                        >
+                                        <TableRow hover key={index}>
                                             {columns.map((column) => {
                                                 return (
                                                     <TableCell key={column.id}>
-                                                        {song[column.id]}
+                                                        {column.id ===
+                                                        'timestamp'
+                                                            ? new Date(
+                                                                  song.timestamp
+                                                                      .seconds *
+                                                                      1000
+                                                              ).toLocaleDateString(
+                                                                  'en-US',
+                                                                  {
+                                                                      weekday:
+                                                                          'short', // long, short, narrow
+                                                                      day: 'numeric', // numeric, 2-digit
+                                                                      year: 'numeric', // numeric, 2-digit
+                                                                      month: 'long', // numeric, 2-digit, long, short, narrow
+                                                                      hour: 'numeric', // numeric, 2-digit
+                                                                      minute: 'numeric', // numeric, 2-digit
+                                                                      second: 'numeric', // numeric, 2-digit
+                                                                  }
+                                                              )
+                                                            : song[column.id]}
                                                     </TableCell>
                                                 );
                                             })}
@@ -288,20 +242,8 @@ const Music = ({ properties }: any) => {
                     )}
                 </DialogContent>
                 <DialogActions>
-                    {musicData.properties?.isUpdate ? (
-                        <Button
-                            color="error"
-                            onClick={DeleteMusic}
-                            disabled={status.isLoading}
-                        >
-                            Delete
-                        </Button>
-                    ) : null}
-                    <Button onClick={() => setMusicDialogIsOpen(false)}>
-                        Cancel
-                    </Button>
-                    <Button onClick={AddMusic} disabled={status.isLoading}>
-                        Add
+                    <Button color="error" disabled={status.isLoading}>
+                        Delete
                     </Button>
                 </DialogActions>
             </Dialog>
