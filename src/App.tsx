@@ -42,9 +42,10 @@ export default function App() {
         initializeApp(config);
         const userEmail = getTokenValue('email')?.split('@')[0] + '-token';
         const userToken = getTokenValue('token');
+
         if (userEmail && userToken)
             onSnapshot(
-                doc(getFirestore(), 'loofi-dashboard', String(userEmail)),
+                doc(getFirestore(), 'thalia-tiffany', String(userEmail)),
                 (token) => {
                     if (
                         token &&
