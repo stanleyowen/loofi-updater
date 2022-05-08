@@ -2,8 +2,8 @@
 
 _Personal Information Collection_
 
-Loofi Dashboard collects and stores information to provide our services.
+Logger Dashboard collects and stores information to provide our services.
 
 _Non-Personal Information Collection_
 
-Loofi Dashboard collects and stores data which are useful for logging, bugs, and fix crashes. All information sent is anonymous and free of any user or contextual data.
+Logger Dashboard collects and stores data which are useful for logging, bugs, and fix crashes. All information sent is anonymous and free of any user or contextual data.
