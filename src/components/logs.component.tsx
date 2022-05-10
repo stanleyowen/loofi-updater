@@ -164,7 +164,7 @@ const Music = ({ properties }: any) => {
                                 })
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={2}>
+                                <TableCell colSpan={3}>
                                     <LinearProgress />
                                 </TableCell>
                             </TableRow>
