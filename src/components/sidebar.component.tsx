@@ -70,10 +70,8 @@ const SideBar = ({ handleChange, properties }: any) => {
                                 id={tab.toLowerCase()}
                             >
                                 <div className="w-30">
-                                    {tab.toLowerCase() === 'download' ? (
-                                        <Download />
-                                    ) : properties.activeTab ===
-                                      tab.toLowerCase() ? (
+                                    {properties.activeTab ===
+                                    tab.toLowerCase() ? (
                                         <SolidIcon />
                                     ) : (
                                         <OutlineIcon />
