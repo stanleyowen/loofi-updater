@@ -18,6 +18,8 @@ import {
     LogsOutline,
     LogsSolid as PathSolid,
     LogsOutline as PathOutline,
+    License as EnvironmentSolid,
+    License as EnvironmentOutline,
 } from '../lib/icons.component';
 
 // eslint-disable-next-line
@@ -43,47 +45,51 @@ const SideBar = ({ handleChange, properties }: any) => {
     return (
         <div className="sidebar">
             <div id="tabs">
-                {['Home', 'Path', 'Logs', 'Settings'].map((tab, index) => {
-                    const components: { [key: string]: any } = {
-                        Download,
-                        HomeSolid,
-                        HomeOutline,
-                        SettingsSolid,
-                        SettingsOutline,
-                        LogsSolid,
-                        LogsOutline,
-                        PathSolid,
-                        PathOutline,
-                    };
-                    const SolidIcon = components[`${tab}Solid`];
-                    const OutlineIcon = components[`${tab}Outline`];
-                    return (
-                        <Tooltip
-                            title={tab}
-                            enterDelay={500}
-                            enterNextDelay={500}
-                            key={index}
-                            onClick={() => switchTab(tab.toLowerCase())}
-                        >
-                            <Button
-                                className="w-100 rounded-corner p-10 tab"
-                                id={tab.toLowerCase()}
+                {['Home', 'Path', 'Logs', 'Environment', 'Settings'].map(
+                    (tab, index) => {
+                        const components: { [key: string]: any } = {
+                            Download,
+                            HomeSolid,
+                            HomeOutline,
+                            SettingsSolid,
+                            SettingsOutline,
+                            LogsSolid,
+                            LogsOutline,
+                            PathSolid,
+                            PathOutline,
+                            EnvironmentSolid,
+                            EnvironmentOutline,
+                        };
+                        const SolidIcon = components[`${tab}Solid`];
+                        const OutlineIcon = components[`${tab}Outline`];
+                        return (
+                            <Tooltip
+                                title={tab}
+                                enterDelay={500}
+                                enterNextDelay={500}
+                                key={index}
+                                onClick={() => switchTab(tab.toLowerCase())}
                             >
-                                <div className="w-30">
-                                    {properties.activeTab ===
-                                    tab.toLowerCase() ? (
-                                        <SolidIcon />
-                                    ) : (
-                                        <OutlineIcon />
-                                    )}
-                                </div>
-                                <div className="w-70 left-align">
-                                    {tab.toLowerCase()}
-                                </div>
-                            </Button>
-                        </Tooltip>
-                    );
-                })}
+                                <Button
+                                    className="w-100 rounded-corner p-10 tab"
+                                    id={tab.toLowerCase()}
+                                >
+                                    <div className="w-30">
+                                        {properties.activeTab ===
+                                        tab.toLowerCase() ? (
+                                            <SolidIcon />
+                                        ) : (
+                                            <OutlineIcon />
+                                        )}
+                                    </div>
+                                    <div className="w-70 left-align">
+                                        {tab.toLowerCase()}
+                                    </div>
+                                </Button>
+                            </Tooltip>
+                        );
+                    }
+                )}
                 {process.env.REACT_APP_ALLOW_BETA === 'true' ? (
                     process.env.REACT_APP_CONTEXT === 'production' ? (
                         <Button
