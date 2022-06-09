@@ -1,4 +1,3 @@
-import { onValue, ref, set, remove, update } from '@firebase/database';
 import {
     Alert,
     Button,
@@ -16,14 +15,7 @@ import {
     TextField,
     DialogActions,
 } from '@mui/material';
-import {
-    collection,
-    getDoc,
-    getDocs,
-    getFirestore,
-    orderBy,
-    query,
-} from 'firebase/firestore';
+import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { Close } from '../lib/icons.component';
 
@@ -41,16 +33,20 @@ const Environment = ({ properties }: any) => {
     const [dialogIsOpen, setDialogIsOpen] = useState<boolean>(false);
 
     useEffect(() => {
-        getDocs(
-            query(
-                collection(getFirestore(), 'logs/'),
-                orderBy('timestamp', 'desc')
-            )
-        ).then((snapshot) => {
-            const rawLogs: any = [];
-            snapshot.docs.map((doc) => rawLogs.push(doc.data()));
-            setLogData(rawLogs);
-        });
+        axios
+            .get(process.env.REACT_APP_ENV_URL ?? '', {
+                auth: {
+                    username: process.env.REACT_APP_AUTH_USERNAME ?? '',
+                    password: process.env.REACT_APP_AUTH_PASSWORD ?? '',
+                },
+            })
+            .then((e) => {
+                const data = Object.entries(e.data).map(([key, value]) => ({
+                    key,
+                    value,
+                }));
+                console.log(data);
+            });
     }, []);
 
     // const DeleteMusic = () => {
@@ -61,18 +57,13 @@ const Environment = ({ properties }: any) => {
 
     const columns = [
         {
-            id: 'error',
-            label: 'Error',
+            id: 'key',
+            label: 'Key',
             minWidth: 170,
         },
         {
-            id: 'message',
-            label: 'Description',
-            minWidth: 100,
-        },
-        {
-            id: 'timestamp',
-            label: 'Timestamp',
+            id: 'value',
+            label: 'Value',
             minWidth: 100,
         },
         {
@@ -113,26 +104,7 @@ const Environment = ({ properties }: any) => {
                                                 return (
                                                     <TableCell key={column.id}>
                                                         {column.id ===
-                                                        'timestamp' ? (
-                                                            new Date(
-                                                                song.timestamp
-                                                                    .seconds *
-                                                                    1000
-                                                            ).toLocaleDateString(
-                                                                'en-US',
-                                                                {
-                                                                    weekday:
-                                                                        'short',
-                                                                    day: 'numeric',
-                                                                    year: 'numeric',
-                                                                    month: 'long',
-                                                                    hour: 'numeric',
-                                                                    minute: 'numeric',
-                                                                    second: 'numeric',
-                                                                }
-                                                            )
-                                                        ) : column.id ===
-                                                          'delete' ? (
+                                                        'delete' ? (
                                                             <Button
                                                                 onClick={() =>
                                                                     setDialogIsOpen(
