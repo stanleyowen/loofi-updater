@@ -38,24 +38,7 @@ const Music = ({ properties }: any) => {
     });
     const [page, setPage] = useState<number>(0);
     const [rowPerPage, setRowPerPage] = useState<number>(10);
-    const [musicDialogIsOpen, setMusicDialogIsOpen] = useState<boolean>(false);
-    const [musicData, setMusicData] = useState<any>({
-        audio: '',
-        author: '',
-        image: '',
-        title: '',
-        properties: {
-            isUpdate: false,
-            id: null,
-        },
-    });
-
-    const handleStatus = (id: string, value: boolean) => {
-        setStatus({ ...status, [id]: value });
-    };
-    const handleMusicData = (id: string, value: string) => {
-        setMusicData({ ...musicData, [id]: value });
-    };
+    const [dialogIsOpen, setDialogIsOpen] = useState<boolean>(false);
 
     useEffect(() => {
         getDocs(
@@ -101,19 +84,6 @@ const Music = ({ properties }: any) => {
 
     return (
         <div className="m-10">
-            <div className="col-2 mb-10">
-                <div className="card p-10">
-                    <h2 className="center-align">
-                        {logs && logs.length === 0 ? '-' : logs.length}
-                    </h2>
-                    <p className="center-align">Music</p>
-                </div>
-                <div className="card p-10">
-                    <h2 className="center-align">-</h2>
-                    <p className="center-align">Music</p>
-                </div>
-            </div>
-
             <TableContainer>
                 <Table className="card">
                     <TableHead>
@@ -165,8 +135,8 @@ const Music = ({ properties }: any) => {
                                                           'delete' ? (
                                                             <Button
                                                                 onClick={() =>
-                                                                    console.log(
-                                                                        'hi'
+                                                                    setDialogIsOpen(
+                                                                        true
                                                                     )
                                                                 }
                                                                 variant="outlined"
@@ -210,59 +180,21 @@ const Music = ({ properties }: any) => {
 
             <Dialog
                 fullWidth
-                open={musicDialogIsOpen}
-                onClose={() => {
-                    setMusicDialogIsOpen(false);
-                    setMusicData({
-                        audio: '',
-                        author: '',
-                        image: '',
-                        title: '',
-                        properties: {
-                            isUpdate: false,
-                            id: null,
-                        },
-                    });
-                }}
+                open={dialogIsOpen}
+                onClose={() => setDialogIsOpen(false)}
             >
-                <DialogTitle>Add Music</DialogTitle>
+                <DialogTitle className="error">
+                    Delete Log Permanently
+                </DialogTitle>
                 <DialogContent>
-                    {status.isError ? (
-                        <Alert severity="error" className="w-100 border-box">
-                            Something went wrong. Please try again.
-                        </Alert>
-                    ) : null}
-
-                    {Object.keys(musicData).map(
-                        (data: string, index: number) => {
-                            if (data === 'properties') return null;
-                            else
-                                return (
-                                    <TextField
-                                        fullWidth
-                                        type="text"
-                                        key={index}
-                                        label={
-                                            Array.from(data)[0].toUpperCase() +
-                                            data.slice(1)
-                                        }
-                                        margin="dense"
-                                        variant="standard"
-                                        autoFocus={index === 0}
-                                        value={musicData[data]}
-                                        onChange={(e) =>
-                                            handleMusicData(
-                                                data,
-                                                e.target.value
-                                            )
-                                        }
-                                    />
-                                );
-                        }
-                    )}
+                    Are you sure want to delete this invoice permanently? This
+                    action is <span className="error">irreversible</span>.
                 </DialogContent>
                 <DialogActions>
-                    <Button color="error" disabled={status.isLoading}>
+                    <Button onClick={() => setDialogIsOpen(false)}>
+                        Cancel
+                    </Button>
+                    <Button color="error" onClick={() => console.log('hi')}>
                         Delete
                     </Button>
                 </DialogActions>
