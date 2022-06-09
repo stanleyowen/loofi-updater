@@ -28,9 +28,17 @@ const Environment = ({ properties }: any) => {
         isLoading: false,
         isError: false,
     });
+    const [data, setData] = useState<any>({
+        key: '',
+        value: '',
+    });
     const [page, setPage] = useState<number>(0);
     const [rowPerPage, setRowPerPage] = useState<number>(10);
     const [dialogIsOpen, setDialogIsOpen] = useState<boolean>(false);
+
+    const handleData = (key: string, value: string | number) => {
+        setData({ ...data, [key]: value });
+    };
 
     useEffect(() => {
         axios
@@ -45,9 +53,17 @@ const Environment = ({ properties }: any) => {
                     key,
                     value,
                 }));
-                console.log(data);
+                setLogData(data);
             });
     }, []);
+
+    const UpdateEnv = (data: any) => {
+        setDialogIsOpen(true);
+        setData({
+            ...data,
+            properties: { isUpdate: true },
+        });
+    };
 
     // const DeleteMusic = () => {
     //     setMusicDialogIsOpen(false);
@@ -99,7 +115,11 @@ const Environment = ({ properties }: any) => {
                                 )
                                 .map((song: any, index: number) => {
                                     return (
-                                        <TableRow hover key={index}>
+                                        <TableRow
+                                            hover
+                                            key={index}
+                                            onClick={() => UpdateEnv(song)}
+                                        >
                                             {columns.map((column) => {
                                                 return (
                                                     <TableCell key={column.id}>
@@ -159,16 +179,35 @@ const Environment = ({ properties }: any) => {
                     Delete Log Permanently
                 </DialogTitle>
                 <DialogContent>
-                    Are you sure want to delete this invoice permanently? This
-                    action is <span className="error">irreversible</span>.
+                    {Object.keys(columns).map((_, index: number) => {
+                        const { id, label } = columns[index];
+                        return id !== 'delete' ? (
+                            <TextField
+                                required
+                                id={id}
+                                fullWidth
+                                key={index}
+                                type="text"
+                                multiline={id === 'value'}
+                                label={label}
+                                margin="dense"
+                                variant="standard"
+                                value={data[id]}
+                                onChange={(e) =>
+                                    handleData('key', e.target.value)
+                                }
+                            />
+                        ) : null;
+                    })}
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setDialogIsOpen(false)}>
+                    <Button
+                        color="error"
+                        onClick={() => setDialogIsOpen(false)}
+                    >
                         Cancel
                     </Button>
-                    <Button color="error" onClick={() => console.log('hi')}>
-                        Delete
-                    </Button>
+                    <Button onClick={() => console.log('hi')}>Update</Button>
                 </DialogActions>
             </Dialog>
         </div>
