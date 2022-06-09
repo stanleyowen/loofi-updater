@@ -25,6 +25,7 @@ import {
     query,
 } from 'firebase/firestore';
 import React, { useState, useEffect } from 'react';
+import { Close } from '../lib/icons.component';
 
 const Music = ({ properties }: any) => {
     const [logs, setLogData] = useState<any>([]);
@@ -91,6 +92,11 @@ const Music = ({ properties }: any) => {
             label: 'Timestamp',
             minWidth: 100,
         },
+        {
+            id: 'delete',
+            label: '',
+            width: 'auto',
+        },
     ];
 
     return (
@@ -137,25 +143,39 @@ const Music = ({ properties }: any) => {
                                                 return (
                                                     <TableCell key={column.id}>
                                                         {column.id ===
-                                                        'timestamp'
-                                                            ? new Date(
-                                                                  song.timestamp
-                                                                      .seconds *
-                                                                      1000
-                                                              ).toLocaleDateString(
-                                                                  'en-US',
-                                                                  {
-                                                                      weekday:
-                                                                          'short', // long, short, narrow
-                                                                      day: 'numeric', // numeric, 2-digit
-                                                                      year: 'numeric', // numeric, 2-digit
-                                                                      month: 'long', // numeric, 2-digit, long, short, narrow
-                                                                      hour: 'numeric', // numeric, 2-digit
-                                                                      minute: 'numeric', // numeric, 2-digit
-                                                                      second: 'numeric', // numeric, 2-digit
-                                                                  }
-                                                              )
-                                                            : song[column.id]}
+                                                        'timestamp' ? (
+                                                            new Date(
+                                                                song.timestamp
+                                                                    .seconds *
+                                                                    1000
+                                                            ).toLocaleDateString(
+                                                                'en-US',
+                                                                {
+                                                                    weekday:
+                                                                        'short',
+                                                                    day: 'numeric',
+                                                                    year: 'numeric',
+                                                                    month: 'long',
+                                                                    hour: 'numeric',
+                                                                    minute: 'numeric',
+                                                                    second: 'numeric',
+                                                                }
+                                                            )
+                                                        ) : column.id ===
+                                                          'delete' ? (
+                                                            <Button
+                                                                onClick={() =>
+                                                                    console.log(
+                                                                        'hi'
+                                                                    )
+                                                                }
+                                                                variant="outlined"
+                                                            >
+                                                                <Close />
+                                                            </Button>
+                                                        ) : (
+                                                            song[column.id]
+                                                        )}
                                                     </TableCell>
                                                 );
                                             })}
