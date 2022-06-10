@@ -262,26 +262,6 @@ export function ThemesApp() {
         </svg>
     );
 }
-export function Play() {
-    return (
-        <svg width="1.1em" height="1.1em" viewBox="0 0 256 256">
-            <path
-                d="M239.969 128a15.9 15.9 0 0 1-7.656 13.656l-143.97 87.985A15.998 15.998 0 0 1 64 215.992V40.008a15.998 15.998 0 0 1 24.344-13.649l143.969 87.985A15.9 15.9 0 0 1 239.969 128z"
-                fill="currentColor"
-            ></path>
-        </svg>
-    );
-}
-export function Pause() {
-    return (
-        <svg width="1.1em" height="1.1em" viewBox="0 0 256 256">
-            <path
-                d="M216 48v160a16.018 16.018 0 0 1-16 16h-36a16.018 16.018 0 0 1-16-16V48a16.018 16.018 0 0 1 16-16h36a16.018 16.018 0 0 1 16 16zM92 32H56a16.018 16.018 0 0 0-16 16v160a16.018 16.018 0 0 0 16 16h36a16.018 16.018 0 0 0 16-16V48a16.018 16.018 0 0 0-16-16z"
-                fill="currentColor"
-            ></path>
-        </svg>
-    );
-}
 export function Changelog() {
     return (
         <svg width="1.2em" height="1.2em" viewBox="0 0 24 24">
@@ -451,6 +431,21 @@ export function LogsSolid() {
             <path
                 d="M17.8 20c-.4 1.2-1.5 2-2.8 2H5c-1.7 0-3-1.3-3-3v-1h12.2c.4 1.2 1.5 2 2.8 2h.8M19 2H8C6.3 2 5 3.3 5 5v11h11v1c0 .6.4 1 1 1h1V5c0-.6.4-1 1-1s1 .4 1 1v1h2V5c0-1.7-1.3-3-3-3z"
                 fill="currentColor"
+            ></path>
+        </svg>
+    );
+}
+export function Plus() {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="1em"
+            height="1em"
+            viewBox="0 0 24 24"
+        >
+            <path
+                fill="currentColor"
+                d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2Z"
             ></path>
         </svg>
     );

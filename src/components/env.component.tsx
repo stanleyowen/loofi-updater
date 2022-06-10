@@ -17,7 +17,7 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
-import { Close } from '../lib/icons.component';
+import { Close, Plus } from '../lib/icons.component';
 
 const Environment = ({ properties }: any) => {
     const [logs, setLogData] = useState<any>([]);
@@ -114,6 +114,14 @@ const Environment = ({ properties }: any) => {
 
     return (
         <div className="m-10">
+            <Button
+                variant="contained"
+                className="mb-10"
+                startIcon={<Plus />}
+                onClick={() => setDialogIsOpen(true)}
+            >
+                Add Variable
+            </Button>
             <TableContainer>
                 <Table className="card">
                     <TableHead>
@@ -199,7 +207,8 @@ const Environment = ({ properties }: any) => {
                 onClose={() => setDialogIsOpen(false)}
             >
                 <DialogTitle className="error">
-                    Delete Log Permanently
+                    {data?.properties?.isUpdate ? 'Edit' : 'Add'} Environment
+                    Variable
                 </DialogTitle>
                 <DialogContent>
                     {Object.keys(columns).map((_, index: number) => {
@@ -228,7 +237,9 @@ const Environment = ({ properties }: any) => {
                     >
                         Cancel
                     </Button>
-                    <Button onClick={() => SubmitEnv()}>Update</Button>
+                    <Button onClick={() => SubmitEnv()}>
+                        {data?.properties?.isUpdate === true ? 'Update' : 'Add'}
+                    </Button>
                 </DialogActions>
             </Dialog>
         </div>
