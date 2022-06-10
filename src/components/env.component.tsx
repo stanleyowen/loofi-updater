@@ -57,6 +57,29 @@ const Environment = ({ properties }: any) => {
             });
     }, []);
 
+    const SubmitEnv = () => {
+        if (data?.properties?.isUpdate) {
+            axios
+                .patch(
+                    process.env.REACT_APP_ENV_URL ?? '',
+                    { [data.key]: data.value },
+                    {
+                        auth: {
+                            username: process.env.REACT_APP_AUTH_USERNAME ?? '',
+                            password: process.env.REACT_APP_AUTH_PASSWORD ?? '',
+                        },
+                    }
+                )
+                .then((e) => {
+                    const data = Object.entries(e.data).map(([key, value]) => ({
+                        key,
+                        value,
+                    }));
+                    setLogData(data);
+                });
+        }
+    };
+
     const UpdateEnv = (data: any) => {
         setDialogIsOpen(true);
         setData({
@@ -193,9 +216,7 @@ const Environment = ({ properties }: any) => {
                                 margin="dense"
                                 variant="standard"
                                 value={data[id]}
-                                onChange={(e) =>
-                                    handleData('key', e.target.value)
-                                }
+                                onChange={(e) => handleData(id, e.target.value)}
                             />
                         ) : null;
                     })}
@@ -207,7 +228,7 @@ const Environment = ({ properties }: any) => {
                     >
                         Cancel
                     </Button>
-                    <Button onClick={() => console.log('hi')}>Update</Button>
+                    <Button onClick={() => SubmitEnv()}>Update</Button>
                 </DialogActions>
             </Dialog>
         </div>
