@@ -24,9 +24,11 @@ const Environment = ({ properties }: any) => {
     const [status, setStatus] = useState<{
         isLoading: boolean;
         isError: boolean;
+        updateDialogIsOpen: boolean;
     }>({
         isLoading: false,
         isError: false,
+        updateDialogIsOpen: false,
     });
     const [data, setData] = useState<any>({
         key: '',
@@ -34,11 +36,24 @@ const Environment = ({ properties }: any) => {
     });
     const [page, setPage] = useState<number>(0);
     const [rowPerPage, setRowPerPage] = useState<number>(10);
-    const [dialogIsOpen, setDialogIsOpen] = useState<boolean>(false);
 
     const handleData = (key: string, value: string | number) => {
         setData({ ...data, [key]: value });
     };
+    const handleStatus = (key: string, value: boolean) => {
+        setStatus({ ...status, [key]: value });
+    };
+
+    function closeDialog() {
+        setStatus({
+            ...status,
+            updateDialogIsOpen: false,
+        });
+        setData({
+            key: '',
+            value: '',
+        });
+    }
 
     useEffect(() => {
         axios
@@ -58,6 +73,7 @@ const Environment = ({ properties }: any) => {
     }, []);
 
     const SubmitEnv = () => {
+        handleStatus('isLoading', true);
         if (data?.properties?.isUpdate) {
             axios
                 .patch(
@@ -76,12 +92,13 @@ const Environment = ({ properties }: any) => {
                         value,
                     }));
                     setLogData(data);
+                    handleStatus('isLoading', false);
                 });
         }
     };
 
     const UpdateEnv = (data: any) => {
-        setDialogIsOpen(true);
+        handleStatus('updateDialogIsOpen', true);
         setData({
             ...data,
             properties: { isUpdate: true },
@@ -118,7 +135,7 @@ const Environment = ({ properties }: any) => {
                 variant="contained"
                 className="mb-10"
                 startIcon={<Plus />}
-                onClick={() => setDialogIsOpen(true)}
+                onClick={() => handleStatus('updateDialogIsOpen', true)}
             >
                 Add Variable
             </Button>
@@ -158,7 +175,8 @@ const Environment = ({ properties }: any) => {
                                                         'delete' ? (
                                                             <Button
                                                                 onClick={() =>
-                                                                    setDialogIsOpen(
+                                                                    handleStatus(
+                                                                        'updateDialogIsOpen',
                                                                         true
                                                                     )
                                                                 }
@@ -203,8 +221,8 @@ const Environment = ({ properties }: any) => {
 
             <Dialog
                 fullWidth
-                open={dialogIsOpen}
-                onClose={() => setDialogIsOpen(false)}
+                open={status.updateDialogIsOpen}
+                onClose={() => closeDialog()}
             >
                 <DialogTitle className="error">
                     {data?.properties?.isUpdate ? 'Edit' : 'Add'} Environment
@@ -231,13 +249,13 @@ const Environment = ({ properties }: any) => {
                     })}
                 </DialogContent>
                 <DialogActions>
-                    <Button
-                        color="error"
-                        onClick={() => setDialogIsOpen(false)}
-                    >
+                    <Button color="error" onClick={() => closeDialog()}>
                         Cancel
                     </Button>
-                    <Button onClick={() => SubmitEnv()}>
+                    <Button
+                        disabled={status.isLoading}
+                        onClick={() => SubmitEnv()}
+                    >
                         {data?.properties?.isUpdate === true ? 'Update' : 'Add'}
                     </Button>
                 </DialogActions>
