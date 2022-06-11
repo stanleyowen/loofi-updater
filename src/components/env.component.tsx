@@ -1,5 +1,4 @@
 import {
-    Alert,
     Button,
     Table,
     TableContainer,
@@ -20,15 +19,13 @@ import React, { useState, useEffect } from 'react';
 import { Plus } from '../lib/icons.component';
 
 const Environment = ({ properties }: any) => {
-    const [logs, setLogData] = useState<any>([]);
+    const [env, setEnv] = useState<any>([]);
     const [status, setStatus] = useState<{
         isLoading: boolean;
-        isError: boolean;
-        updateDialogIsOpen: boolean;
+        dialogIsOpen: boolean;
     }>({
         isLoading: false,
-        isError: false,
-        updateDialogIsOpen: false,
+        dialogIsOpen: false,
     });
     const [data, setData] = useState<any>({
         key: '',
@@ -45,7 +42,10 @@ const Environment = ({ properties }: any) => {
     };
 
     function closeDialog() {
-        handleStatus('updateDialogIsOpen', false);
+        setStatus({
+            isLoading: false,
+            dialogIsOpen: false,
+        });
         setData({
             key: '',
             value: '',
@@ -65,7 +65,7 @@ const Environment = ({ properties }: any) => {
                     key,
                     value,
                 }));
-                setLogData(data);
+                setEnv(data);
             });
     }, []);
 
@@ -73,6 +73,7 @@ const Environment = ({ properties }: any) => {
         handleStatus('isLoading', true);
         delete data?.properties;
         let body;
+
         if (method === 'delete') body = { [data.key]: null };
         else body = { [data.key]: data.value };
 
@@ -88,25 +89,18 @@ const Environment = ({ properties }: any) => {
                     key,
                     value,
                 }));
-                setLogData(data);
-                handleStatus('isLoading', false);
+                setEnv(data);
                 closeDialog();
             });
     };
 
     const UpdateEnv = (env: any) => {
-        handleStatus('updateDialogIsOpen', true);
+        handleStatus('dialogIsOpen', true);
         setData({
             ...env,
             properties: { isUpdate: true },
         });
     };
-
-    // const DeleteMusic = () => {
-    //     setMusicDialogIsOpen(false);
-    //     const id = musicData.properties.id + page * rowPerPage;
-    //     remove(ref(getFirestore(), 'logs/' + id));
-    // };
 
     const columns = [
         {
@@ -127,7 +121,7 @@ const Environment = ({ properties }: any) => {
                 variant="contained"
                 className="mb-10"
                 startIcon={<Plus />}
-                onClick={() => handleStatus('updateDialogIsOpen', true)}
+                onClick={() => handleStatus('dialogIsOpen', true)}
             >
                 Add Variable
             </Button>
@@ -147,8 +141,8 @@ const Environment = ({ properties }: any) => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {logs && logs?.length > 0 ? (
-                            logs
+                        {env && env?.length > 0 ? (
+                            env
                                 .slice(
                                     page * rowPerPage,
                                     page * rowPerPage + rowPerPage
@@ -184,7 +178,7 @@ const Environment = ({ properties }: any) => {
             <TablePagination
                 className="card"
                 component="div"
-                count={logs.length ?? 0}
+                count={env.length ?? 0}
                 rowsPerPage={rowPerPage}
                 page={page}
                 onPageChange={(_, newPage) => {
@@ -198,7 +192,7 @@ const Environment = ({ properties }: any) => {
 
             <Dialog
                 fullWidth
-                open={status.updateDialogIsOpen}
+                open={status.dialogIsOpen}
                 onClose={() => closeDialog()}
             >
                 <DialogTitle className="error">
@@ -208,21 +202,28 @@ const Environment = ({ properties }: any) => {
                 <DialogContent>
                     {Object.keys(columns).map((_, index: number) => {
                         const { id, label } = columns[index];
-                        return id !== 'delete' ? (
+                        return (
                             <TextField
                                 id={id}
                                 required
                                 fullWidth
                                 key={index}
                                 type="text"
-                                multiline={id === 'value'}
                                 label={label}
                                 margin="dense"
                                 variant="standard"
+                                multiline={id === 'value'}
                                 value={data[id].replace(/\\n/g, '\n')}
-                                onChange={(e) => handleData(id, e.target.value)}
+                                disabled={
+                                    data?.properties?.isUpdate && id === 'key'
+                                }
+                                onChange={(e) =>
+                                    data?.properties?.isUpdate &&
+                                    id !== 'key' &&
+                                    handleData(id, e.target.value)
+                                }
                             />
-                        ) : null;
+                        );
                     })}
                 </DialogContent>
                 <DialogActions>
