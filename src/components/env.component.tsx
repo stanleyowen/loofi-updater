@@ -45,10 +45,7 @@ const Environment = ({ properties }: any) => {
     };
 
     function closeDialog() {
-        setStatus({
-            ...status,
-            updateDialogIsOpen: false,
-        });
+        handleStatus('updateDialogIsOpen', false);
         setData({
             key: '',
             value: '',
@@ -93,6 +90,7 @@ const Environment = ({ properties }: any) => {
                     }));
                     setLogData(data);
                     handleStatus('isLoading', false);
+                    closeDialog();
                 });
         }
     };
@@ -233,8 +231,8 @@ const Environment = ({ properties }: any) => {
                         const { id, label } = columns[index];
                         return id !== 'delete' ? (
                             <TextField
-                                required
                                 id={id}
+                                required
                                 fullWidth
                                 key={index}
                                 type="text"
@@ -242,7 +240,7 @@ const Environment = ({ properties }: any) => {
                                 label={label}
                                 margin="dense"
                                 variant="standard"
-                                value={data[id]}
+                                value={data[id].replace(/\\n/g, '\n')}
                                 onChange={(e) => handleData(id, e.target.value)}
                             />
                         ) : null;
