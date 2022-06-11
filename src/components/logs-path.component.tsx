@@ -187,7 +187,7 @@ const Music = ({ properties }: any) => {
                     Delete Log Permanently
                 </DialogTitle>
                 <DialogContent>
-                    Are you sure want to delete this invoice permanently? This
+                    Are you sure want to delete this log permanently? This
                     action is <span className="error">irreversible</span>.
                 </DialogContent>
                 <DialogActions>

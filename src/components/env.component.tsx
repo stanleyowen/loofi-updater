@@ -17,7 +17,7 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
-import { Close, Plus } from '../lib/icons.component';
+import { Plus } from '../lib/icons.component';
 
 const Environment = ({ properties }: any) => {
     const [logs, setLogData] = useState<any>([]);
@@ -95,10 +95,10 @@ const Environment = ({ properties }: any) => {
         }
     };
 
-    const UpdateEnv = (data: any) => {
+    const UpdateEnv = (env: any) => {
         handleStatus('updateDialogIsOpen', true);
         setData({
-            ...data,
+            ...env,
             properties: { isUpdate: true },
         });
     };
@@ -119,11 +119,6 @@ const Environment = ({ properties }: any) => {
             id: 'value',
             label: 'Value',
             minWidth: 100,
-        },
-        {
-            id: 'delete',
-            label: '',
-            width: 'auto',
         },
     ];
 
@@ -169,22 +164,7 @@ const Environment = ({ properties }: any) => {
                                             {columns.map((column) => {
                                                 return (
                                                     <TableCell key={column.id}>
-                                                        {column.id ===
-                                                        'delete' ? (
-                                                            <Button
-                                                                onClick={() =>
-                                                                    handleStatus(
-                                                                        'updateDialogIsOpen',
-                                                                        true
-                                                                    )
-                                                                }
-                                                                variant="outlined"
-                                                            >
-                                                                <Close />
-                                                            </Button>
-                                                        ) : (
-                                                            song[column.id]
-                                                        )}
+                                                        {song[column.id]}
                                                     </TableCell>
                                                 );
                                             })}
@@ -247,7 +227,15 @@ const Environment = ({ properties }: any) => {
                     })}
                 </DialogContent>
                 <DialogActions>
-                    <Button color="error" onClick={() => closeDialog()}>
+                    {data?.properties?.isDelete ? (
+                        <Button
+                            color="error"
+                            onClick={() => console.log('delete')}
+                        >
+                            Delete
+                        </Button>
+                    ) : null}
+                    <Button color="inherit" onClick={() => closeDialog()}>
                         Cancel
                     </Button>
                     <Button
