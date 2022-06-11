@@ -69,30 +69,29 @@ const Environment = ({ properties }: any) => {
             });
     }, []);
 
-    const SubmitEnv = () => {
+    const SubmitEnv = (method: 'update' | 'add' | 'delete') => {
         handleStatus('isLoading', true);
-        if (data?.properties?.isUpdate) {
-            axios
-                .patch(
-                    process.env.REACT_APP_ENV_URL ?? '',
-                    { [data.key]: data.value },
-                    {
-                        auth: {
-                            username: process.env.REACT_APP_AUTH_USERNAME ?? '',
-                            password: process.env.REACT_APP_AUTH_PASSWORD ?? '',
-                        },
-                    }
-                )
-                .then((e) => {
-                    const data = Object.entries(e.data).map(([key, value]) => ({
-                        key,
-                        value,
-                    }));
-                    setLogData(data);
-                    handleStatus('isLoading', false);
-                    closeDialog();
-                });
-        }
+        delete data?.properties;
+        let body;
+        if (method === 'delete') body = { [data.key]: null };
+        else body = { [data.key]: data.value };
+
+        axios
+            .patch(process.env.REACT_APP_ENV_URL ?? '', body, {
+                auth: {
+                    username: process.env.REACT_APP_AUTH_USERNAME ?? '',
+                    password: process.env.REACT_APP_AUTH_PASSWORD ?? '',
+                },
+            })
+            .then((e) => {
+                const data = Object.entries(e.data).map(([key, value]) => ({
+                    key,
+                    value,
+                }));
+                setLogData(data);
+                handleStatus('isLoading', false);
+                closeDialog();
+            });
     };
 
     const UpdateEnv = (env: any) => {
@@ -227,10 +226,10 @@ const Environment = ({ properties }: any) => {
                     })}
                 </DialogContent>
                 <DialogActions>
-                    {data?.properties?.isDelete ? (
+                    {data?.properties?.isUpdate ? (
                         <Button
                             color="error"
-                            onClick={() => console.log('delete')}
+                            onDoubleClick={() => SubmitEnv('delete')}
                         >
                             Delete
                         </Button>
@@ -240,7 +239,13 @@ const Environment = ({ properties }: any) => {
                     </Button>
                     <Button
                         disabled={status.isLoading}
-                        onClick={() => SubmitEnv()}
+                        onClick={() =>
+                            SubmitEnv(
+                                data?.properties?.isUpdate === true
+                                    ? 'update'
+                                    : 'add'
+                            )
+                        }
                     >
                         {data?.properties?.isUpdate === true ? 'Update' : 'Add'}
                     </Button>
