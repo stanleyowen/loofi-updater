@@ -217,11 +217,12 @@ const Environment = ({ properties }: any) => {
                                 disabled={
                                     data?.properties?.isUpdate && id === 'key'
                                 }
-                                onChange={(e) =>
-                                    data?.properties?.isUpdate &&
-                                    id !== 'key' &&
-                                    handleData(id, e.target.value)
-                                }
+                                onChange={(e) => {
+                                    !data?.properties?.isUpdate
+                                        ? handleData(id, e.target.value)
+                                        : id !== 'key' &&
+                                          handleData(id, e.target.value);
+                                }}
                             />
                         );
                     })}
