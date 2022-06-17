@@ -13,6 +13,11 @@ import {
     DialogContent,
     TextField,
     DialogActions,
+    FormControl,
+    InputLabel,
+    Select,
+    SelectChangeEvent,
+    MenuItem,
 } from '@mui/material';
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
@@ -57,12 +62,15 @@ const Environment = ({ HOST_DOMAIN }: any) => {
 
     useEffect(() => {
         axios
-            .get(process.env.REACT_APP_ENV_URL ?? '', {
-                auth: {
-                    username: process.env.REACT_APP_AUTH_USERNAME ?? '',
-                    password: process.env.REACT_APP_AUTH_PASSWORD ?? '',
-                },
-            })
+            .get(
+                `${process.env.REACT_APP_ENV_URL}/${properties.appName}` ?? '',
+                {
+                    auth: {
+                        username: process.env.REACT_APP_AUTH_USERNAME ?? '',
+                        password: process.env.REACT_APP_AUTH_PASSWORD ?? '',
+                    },
+                }
+            )
             .then((e) => {
                 const data = Object.entries(e.data).map(([key, value]) => ({
                     key,
@@ -70,7 +78,7 @@ const Environment = ({ HOST_DOMAIN }: any) => {
                 }));
                 setEnv(data);
             });
-    }, []);
+    }, [properties.appName]);
 
     const SubmitEnv = (method: 'update' | 'add' | 'delete') => {
         handleStatus('isLoading', true);
