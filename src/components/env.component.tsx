@@ -89,12 +89,16 @@ const Environment = ({ HOST_DOMAIN }: any) => {
         else body = { [data.key]: data.value };
 
         axios
-            .patch(process.env.REACT_APP_ENV_URL ?? '', body, {
-                auth: {
-                    username: process.env.REACT_APP_AUTH_USERNAME ?? '',
-                    password: process.env.REACT_APP_AUTH_PASSWORD ?? '',
-                },
-            })
+            .patch(
+                `${process.env.REACT_APP_ENV_URL}/${properties.appName}` ?? '',
+                body,
+                {
+                    auth: {
+                        username: process.env.REACT_APP_AUTH_USERNAME ?? '',
+                        password: process.env.REACT_APP_AUTH_PASSWORD ?? '',
+                    },
+                }
+            )
             .then((e) => {
                 const data = Object.entries(e.data).map(([key, value]) => ({
                     key,
@@ -136,7 +140,8 @@ const Environment = ({ HOST_DOMAIN }: any) => {
             >
                 Add Variable
             </Button>
-            <FormControl fullWidth>
+
+            <FormControl fullWidth className="mt-10 mb-10">
                 <InputLabel id="app-name">App Name</InputLabel>
                 <Select
                     id="app-name"
