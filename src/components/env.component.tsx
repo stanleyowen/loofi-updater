@@ -18,14 +18,16 @@ import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { Plus } from '../lib/icons.component';
 
-const Environment = ({ properties }: any) => {
+const Environment = ({ HOST_DOMAIN }: any) => {
     const [env, setEnv] = useState<any>([]);
-    const [status, setStatus] = useState<{
+    const [properties, setStatus] = useState<{
         isLoading: boolean;
         dialogIsOpen: boolean;
+        appName: string;
     }>({
         isLoading: false,
         dialogIsOpen: false,
+        appName: '',
     });
     const [data, setData] = useState<any>({
         key: '',
@@ -37,12 +39,13 @@ const Environment = ({ properties }: any) => {
     const handleData = (key: string, value: string | number) => {
         setData({ ...data, [key]: value });
     };
-    const handleStatus = (key: string, value: boolean) => {
-        setStatus({ ...status, [key]: value });
+    const handleStatus = (key: string, value: string | boolean) => {
+        setStatus({ ...properties, [key]: value });
     };
 
     function closeDialog() {
         setStatus({
+            ...properties,
             isLoading: false,
             dialogIsOpen: false,
         });
@@ -125,6 +128,27 @@ const Environment = ({ properties }: any) => {
             >
                 Add Variable
             </Button>
+            <FormControl fullWidth>
+                <InputLabel id="app-name">App Name</InputLabel>
+                <Select
+                    id="app-name"
+                    label="App Name"
+                    labelId="app-name"
+                    value={properties.appName}
+                    onChange={(e: SelectChangeEvent) =>
+                        handleStatus('appName', String(e.target.value))
+                    }
+                >
+                    {process.env.REACT_APP_HEROKU_APP_NAME?.split(',').map(
+                        (appName: string) => (
+                            <MenuItem key={appName} value={appName}>
+                                {appName}
+                            </MenuItem>
+                        )
+                    )}
+                </Select>
+            </FormControl>
+
             <TableContainer>
                 <Table className="card">
                     <TableHead>
@@ -192,7 +216,7 @@ const Environment = ({ properties }: any) => {
 
             <Dialog
                 fullWidth
-                open={status.dialogIsOpen}
+                open={properties.dialogIsOpen}
                 onClose={() => closeDialog()}
             >
                 <DialogTitle className="error">
@@ -240,7 +264,7 @@ const Environment = ({ properties }: any) => {
                         Cancel
                     </Button>
                     <Button
-                        disabled={status.isLoading}
+                        disabled={properties.isLoading}
                         onClick={() =>
                             SubmitEnv(
                                 data?.properties?.isUpdate === true
