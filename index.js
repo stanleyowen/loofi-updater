@@ -1,14 +1,15 @@
-const cors = require("cors");
-const helmet = require("helmet");
-const express = require("express");
-const rateLimit = require("express-rate-limit");
+import cors from "cors";
+import helmet from "helmet";
+import express from "express";
+import rateLimit from "express-rate-limit";
+import { config } from "dotenv";
 
-if (
-  process.env.NODE_ENV !== "production" &&
-  process.env.NODE_ENV !== "staging"
-) {
-  require("dotenv").config();
-}
+import latestRouter from "./routes/latest.route.js";
+import updateRouter from "./routes/updater.route.js";
+
+// Load environment variables from .env file in development environment
+if (process.env.NODE_ENV !== "production" || process.env.NODE_ENV !== "staging")
+  config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -61,7 +62,6 @@ app.use(
   })
 );
 
-const latestRouter = require("./routes/latest.route");
 app.use("/latest", latestRouter);
 
 app.listen(PORT, () => {
