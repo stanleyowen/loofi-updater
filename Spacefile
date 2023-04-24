@@ -5,3 +5,10 @@ micros:
     src: ./
     engine: nodejs16
     primary: true
+    public: true
+    presets:
+      env:
+        - name: GH_TOKEN
+          default: "************"
+        - name: CORS_ORIGIN
+          default: "*"
