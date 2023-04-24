@@ -23,7 +23,11 @@ const limiter = {
 app.use(
   cors({
     origin: (origin, cb) => {
-      if (!origin || process.env.CORS_ORIGIN.split(",").indexOf(origin) !== -1)
+      if (
+        !origin ||
+        process.env.CORS_ORIGIN === "*" ||
+        process.env.CORS_ORIGIN.split(",").indexOf(origin) !== -1
+      )
         cb(null, true);
       else
         cb(
@@ -49,6 +53,7 @@ app.use(express.json({ limit: "5mb" }));
 app.use(express.urlencoded({ extended: true, limit: "5mb" }));
 
 app.use((_, res, next) => {
+  res.header("Accept", "application/vnd.github.preview");
   res.header("Content-Type", "application/json; charset=UTF-8");
   return next();
 });
@@ -63,7 +68,6 @@ app.use(
 );
 
 app.use("/latest", latestRouter);
+app.use("/updater", updateRouter);
 
-app.listen(PORT, () => {
-  console.log(`Server is running on PORT ${PORT}`);
-});
+app.listen(PORT, () => console.log(`Server is running on PORT ${PORT}`));
