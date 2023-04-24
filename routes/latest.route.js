@@ -1,30 +1,47 @@
-import axios from "axios";
 import express from "express";
+import { Octokit } from "octokit";
 const router = express.Router();
 
-router.get("/", (req, res) => {
-  axios
-    .get("https://api.github.com/repos/stanleyowen/loofi/releases/latest")
+const octokit = new Octokit({
+  auth: process.env.GITHUB_TOKEN,
+});
+
+router.get("/", async (_, res) => {
+  await octokit
+    .request("GET /repos/stanleyowen/loofi/releases/latest", {
+      headers: {
+        "X-GitHub-Api-Version": "2022-11-28",
+      },
+    })
     .then((response) => {
-      const assets = response.data.assets;
+      const { assets } = response.data;
+
       res.status(200).send(
         JSON.stringify(
           {
             version: response.data.tag_name,
-            linux: {
+            "linux-x86_64": {
               appImage: assets.filter((asset) =>
                 asset.name.endsWith(".AppImage")
-              )[0].browser_download_url,
+              )[0]?.browser_download_url,
               deb: assets.filter((asset) => asset.name.endsWith(".deb"))[0]
-                .browser_download_url,
+                ?.browser_download_url,
             },
-            macOS: {
+            "darwin-x86_64": {
               dmg: assets.filter((asset) => asset.name.endsWith(".dmg"))[0]
-                .browser_download_url,
+                ?.browser_download_url,
+              app: assets.filter((asset) => asset.name.endsWith(".app"))[0]
+                ?.browser_download_url,
             },
-            windows: {
+            "darwin-aarch64": {
+              dmg: assets.filter((asset) => asset.name.endsWith(".dmg"))[0]
+                ?.browser_download_url,
+              app: assets.filter((asset) => asset.name.endsWith(".app"))[0]
+                ?.browser_download_url,
+            },
+            "windows-x86_64": {
               msi: assets.filter((asset) => asset.name.endsWith(".msi"))[0]
-                .browser_download_url,
+                ?.browser_download_url,
             },
           },
           null,
@@ -33,7 +50,8 @@ router.get("/", (req, res) => {
       );
     })
     .catch((error) => {
-      console.log(error);
+      console.error(error);
+      res.status(400).send(JSON.stringify(error, null, 2));
     });
 });
 

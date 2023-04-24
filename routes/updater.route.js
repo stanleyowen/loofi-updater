@@ -11,7 +11,10 @@ const octokit = new Octokit({
 // Validate the platform whether it is darwin, linux, or windows
 function validatePlatform(platform) {
   return (
-    platform === "darwin" || platform === "linux" || platform === "windows"
+    platform === "darwin-aarch64" ||
+    platform === "darwin-x86_64" ||
+    platform === "linux-x86_64" ||
+    platform === "windows-x86_64"
   );
 }
 
@@ -45,7 +48,7 @@ router.get("/:platform/:current_version", async (req, res) => {
       // Linux: .deb.tar.gz, .AppImage.tar.gz
       let url;
       switch (platform) {
-        case "darwin":
+        case "darwin-x86_64" || "darwin-aarch64":
           url =
             response.data.assets.filter((asset) =>
               asset.name.endsWith(".app.tar.gz")
@@ -54,7 +57,7 @@ router.get("/:platform/:current_version", async (req, res) => {
               asset.name.endsWith(".dmg.tar.gz")
             )[0].browser_download_url;
           break;
-        case "linux":
+        case "linux-x86_64":
           url =
             response.data.assets.filter((asset) =>
               asset.name.endsWith(".AppImage.tar.gz")
@@ -63,7 +66,7 @@ router.get("/:platform/:current_version", async (req, res) => {
               asset.name.endsWith(".deb.tar.gz")
             )[0].browser_download_url;
           break;
-        case "windows":
+        case "windows-x86_64":
           url = response.data.assets.filter((asset) =>
             asset.name.endsWith(".msi.zip")
           )[0].browser_download_url;
@@ -87,6 +90,7 @@ router.get("/:platform/:current_version", async (req, res) => {
       );
     })
     .catch((error) => {
+      console.error(error);
       res.status(400).send(error);
     });
 });
