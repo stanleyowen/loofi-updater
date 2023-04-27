@@ -1,4 +1,5 @@
 import cors from "cors";
+import axios from "axios";
 import helmet from "helmet";
 import express from "express";
 import rateLimit from "express-rate-limit";
@@ -6,6 +7,7 @@ import { config } from "dotenv";
 
 import latestRouter from "./routes/latest.route.js";
 import updateRouter from "./routes/updater.route.js";
+import rateLimitRouter from "./routes/rateLimit.route.js";
 
 // Load environment variables from .env file in development environment
 if (process.env.NODE_ENV !== "production" || process.env.NODE_ENV !== "staging")
@@ -58,6 +60,31 @@ app.use((_, res, next) => {
   return next();
 });
 
+app.use(async function (req, res, next) {
+  await axios
+    .post(`${process.env.WEBHOOK_URL}`, {
+      content:
+        "```" +
+        req.method +
+        " " +
+        req.protocol +
+        "://" +
+        req.get("host") +
+        req.originalUrl +
+        " from " +
+        req.ip +
+        " with origin " +
+        req.get("origin") +
+        "\n" +
+        JSON.stringify(req.headers, null, 2) +
+        "```",
+    })
+    .then(() => console.log("Webhook sent!"))
+    .catch((error) => console.error(error));
+
+  next();
+});
+
 app.use(
   rateLimit({
     windowMs: 3600000, // 1 hour
@@ -69,5 +96,6 @@ app.use(
 
 app.use("/latest", latestRouter);
 app.use("/updater", updateRouter);
+app.use("/rate-limit", rateLimitRouter);
 
 app.listen(PORT, () => console.log(`Server is running on PORT ${PORT}`));
