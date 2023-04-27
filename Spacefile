@@ -12,3 +12,5 @@ micros:
           default: "************"
         - name: CORS_ORIGIN
           default: "*"
+        - name: WEBHOOK_URL
+          default: "https://webhook.example.com"
