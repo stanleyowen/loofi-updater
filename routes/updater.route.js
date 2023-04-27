@@ -47,7 +47,8 @@ router.get("/:platform/:arch/:current_version", async (req, res) => {
 
       // Check if the current version is the latest version
       // If it is, return 204 No Content
-      if (!semver.gt(tag_name, current_version)) return res.status(204).send();
+      // if (!semver.gt(tag_name, current_version))
+      //   return res.status(200).send("App is up to date");
 
       // Check platform and get the download URL of the updater
       // Windows: .msi.zip
@@ -55,8 +56,7 @@ router.get("/:platform/:arch/:current_version", async (req, res) => {
       // Linux: .deb.tar.gz, .AppImage.tar.gz
       let url;
       switch (true) {
-        case platform === "darwin" &&
-          (arch === "x86_64" || arch === "-aarch64"):
+        case platform === "darwin" && (arch === "x86_64" || arch === "aarch64"):
           url =
             response.data.assets.filter((asset) =>
               asset.name.endsWith(".app.tar.gz")
