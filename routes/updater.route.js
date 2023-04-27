@@ -5,7 +5,7 @@ import { Octokit } from "octokit";
 const router = express.Router();
 
 const octokit = new Octokit({
-  auth: process.env.GITHUB_TOKEN,
+  auth: process.env.GH_TOKEN,
 });
 
 // Validate the platform whether it is darwin, linux, or windows

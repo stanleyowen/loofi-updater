@@ -3,7 +3,7 @@ import { Octokit } from "octokit";
 const router = express.Router();
 
 const octokit = new Octokit({
-  auth: process.env.GITHUB_TOKEN,
+  auth: process.env.GH_TOKEN,
 });
 
 router.get("/", async (_, res) => {
