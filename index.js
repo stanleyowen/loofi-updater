@@ -14,7 +14,7 @@ if (process.env.NODE_ENV !== "production" || process.env.NODE_ENV !== "staging")
   config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 const limiter = {
   statusCode: 429,
   statusMessage: "Too Many Requests",
