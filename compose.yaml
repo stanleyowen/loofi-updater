@@ -1,0 +1,27 @@
+# loofi updater API — cloudflared ingress loofi.stanleyowen.com → localhost:3001
+name: loofi
+services:
+  api:
+    build: .
+    image: loofi:latest
+    container_name: loofi
+    env_file: [.env]
+    environment:
+      NODE_ENV: production
+      PORT: "3001"
+      # The GH_TOKEN in .env is invalid (GitHub returns 401). Under pm2 it was never used anyway:
+      # ESM imports run before dotenv config(), so Octokit was created without auth.
+      # Blank keeps that unauthenticated behaviour; set a fresh token here (or fix .env) to authenticate.
+      GH_TOKEN: ""
+    ports:
+      - "127.0.0.1:${HOST_PORT:-3001}:3001"
+    restart: unless-stopped
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 256m
+    pids_limit: 64
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
